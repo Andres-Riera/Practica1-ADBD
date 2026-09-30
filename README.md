@@ -1,20 +1,38 @@
 # Practica1-ADBD
 
 ## 1.
+
+```sql
 CREATE DATABASE biblioteca;
 
+```
+
 ## 2.
-a.
-i.
-CREATE ROLE admin_biblio WITH LOGIN PASSWORD
-'adminpass';
 
-ii.
-CREATE ROLE usuario_biblio WITH LOGIN PASSWORD
-'usuariopass';
+**a.**
 
-b.
+**i.**
+
+```sql
+CREATE ROLE admin_biblio WITH LOGIN PASSWORD 'adminpass';
+
+```
+
+**ii.**
+
+```sql
+CREATE ROLE usuario_biblio WITH LOGIN PASSWORD 'usuariopass';
+
+```
+
+**b.**
+
+```sql
 CREATE ROLE lectores;
+
+```
+
+```text
 postgres=# GRANT CONNECT ON DATABASE biblioteca TO lectores;
 GRANT
 postgres=# GRANT USAGE ON SCHEMA public TO lectores;
@@ -22,12 +40,20 @@ GRANT
 postgres=# GRANT SELECT ON ALL TABLES IN SCHEMA public TO lectores;
 GRANT
 
-c.
+```
+
+**c.**
+
+```text
 postgres=# GRANT lectores TO usuario_biblio;
 NOTICE:  role "usuario_biblio" has already been granted membership in role "lectores" by role "postgres"
 GRANT ROLE
 
-d.
+```
+
+**d.**
+
+```text
 postgres=# SELECT rolname, rolcanlogin, rolsuper
 postgres-# FROM pg_roles
 postgres-# WHERE rolname IN ('admin_biblio', 'usuario_biblio', 'lectores');
@@ -38,25 +64,40 @@ postgres-# WHERE rolname IN ('admin_biblio', 'usuario_biblio', 'lectores');
  usuario_biblio | t           | f
 (3 rows)
 
-e.
+```
+
+**e.**
+
+```text
 postgres=# ALTER USER usuario_biblio WITH PASSWORD '123';
 ALTER ROLE
 
-f.
+```
+
+**f.**
+
+```text
 postgres=# REVOKE DELETE ON ALL TABLES IN SCHEMA public FROM usuario_biblio;
 REVOKE
 
+```
 
 ## 3.
 
-i.
+**i.**
+
+```sql
 CREATE TABLE autores(
 id_autor SERIAL PRIMARY KEY,
 nombre TEXT NOT NULL,
 nacionalidad TEXT
 );
 
-ii.
+```
+
+**ii.**
+
+```text
 biblioteca=# CREATE TABLE libros (
 id_libro SERIAL PRIMARY KEY,
 titulo TEXT NOT NULL,
@@ -68,7 +109,11 @@ ON DELETE CASCADE
 );
 CREATE TABLE
 
-iii.
+```
+
+**iii.**
+
+```text
 biblioteca=# CREATE TABLE prestamos (
 biblioteca(# id_prestamo SERIAL PRIMARY KEY,
 biblioteca(# id_libro INT NOT NULL,
@@ -81,7 +126,11 @@ biblioteca(# ON DELETE CASCADE
 biblioteca(# );
 CREATE TABLE
 
+```
+
 ## 4.
+
+```text
 biblioteca=# INSERT INTO autores (nombre, nacionalidad) VALUES
 ('Gabriel García Márquez', 'Colombia'),
 ('Miguel de Cervantes', 'España'),
@@ -89,6 +138,7 @@ biblioteca=# INSERT INTO autores (nombre, nacionalidad) VALUES
 ('Isabel Allende', 'Chile'),
 ('Jorge Luis Borges', 'Argentina');
 INSERT 0 5
+
 biblioteca=# SELECT * FROM AUTORES;
  id_autor |         nombre         | nacionalidad
 ----------+------------------------+--------------
@@ -99,6 +149,9 @@ biblioteca=# SELECT * FROM AUTORES;
         5 | Jorge Luis Borges      | Argentina
 (5 rows)
 
+```
+
+```text
 biblioteca=# INSERT INTO libros (titulo, año_publicacion, id_autor) VALUES
 ('Cien años de soledad', 1967, 1),
 ('El amor en los tiempos del cólera', 1985, 1),
@@ -109,8 +162,9 @@ biblioteca=# INSERT INTO libros (titulo, año_publicacion, id_autor) VALUES
 ('Ficciones', 1944, 5),
 ('El Aleph', 1949, 5);
 INSERT 0 8
+
 biblioteca=# SELECT * FROM LIBROS;
- id_libro |              titulo               | año_publicacion | id_autor
+ id_libro |               titulo              | año_publicacion | id_autor
 ----------+-----------------------------------+-----------------+----------
         1 | Cien años de soledad              |            1967 |        1
         2 | El amor en los tiempos del cólera |            1985 |        1
@@ -122,6 +176,9 @@ biblioteca=# SELECT * FROM LIBROS;
         8 | El Aleph                          |            1949 |        5
 (8 rows)
 
+```
+
+```text
 biblioteca=# INSERT INTO prestamos (id_libro, fecha_prestamo, fecha_devolucion, usuario_prestatario) VALUES
 (1, '2026-09-01', '2026-09-15', 'Carlos Pérez'),
 (4, '2026-09-10', NULL, 'Ana Gómez'),
@@ -129,6 +186,7 @@ biblioteca=# INSERT INTO prestamos (id_libro, fecha_prestamo, fecha_devolucion, 
 (1, '2026-09-22', NULL, 'Carlos Pérez'),
 (5, '2026-09-25', NULL, 'Marcos Ruiz');
 INSERT 0 5
+
 biblioteca=# SELECT * FROM PRESTAMOS;
  id_prestamo | id_libro | fecha_prestamo | fecha_devolucion | usuario_prestatario
 -------------+----------+----------------+------------------+---------------------
@@ -139,11 +197,16 @@ biblioteca=# SELECT * FROM PRESTAMOS;
            5 |        5 | 2026-09-25     |                  | Marcos Ruiz
 (5 rows)
 
+```
+
 ## 5.
-a.
+
+**a.**
+
+```text
 biblioteca=# SELECT l.titulo, a.nombre FROM
 biblioteca-# libros as l natural join autores as a;
-              titulo               |         nombre
+               titulo              |         nombre
 -----------------------------------+------------------------
  Cien años de soledad              | Gabriel García Márquez
  El amor en los tiempos del cólera | Gabriel García Márquez
@@ -155,7 +218,11 @@ biblioteca-# libros as l natural join autores as a;
  El Aleph                          | Jorge Luis Borges
 (8 rows)
 
-b.
+```
+
+**b.**
+
+```text
 biblioteca=# SELECT * FROM prestamos
 biblioteca-# WHERE fecha_devolucion IS NULL;
  id_prestamo | id_libro | fecha_prestamo | fecha_devolucion | usuario_prestatario
@@ -165,7 +232,11 @@ biblioteca-# WHERE fecha_devolucion IS NULL;
            5 |        5 | 2026-09-25     |                  | Marcos Ruiz
 (3 rows)
 
-c.
+```
+
+**c.**
+
+```text
 biblioteca=# SELECT a.nombre
 biblioteca-# FROM autores AS a NATURAL JOIN libros as l
 biblioteca-# GROUP BY a.id_autor, a.nombre
@@ -177,8 +248,13 @@ biblioteca-# HAVING COUNT(l.id_libro) > 1;
  Gabriel García Márquez
 (3 rows)
 
+```
+
 ## 6.
-a.
+
+**a.**
+
+```text
 biblioteca=# SELECT COUNT(*)
 biblioteca-# FROM prestamos;
  count
@@ -186,7 +262,11 @@ biblioteca-# FROM prestamos;
      5
 (1 row)
 
-b.
+```
+
+**b.**
+
+```text
 biblioteca=# SELECT usuario_prestatario, COUNT(*)
 FROM prestamos
 GROUP BY usuario_prestatario
@@ -199,13 +279,18 @@ GROUP BY usuario_prestatario
  Marcos Ruiz         |     1
 (4 rows)
 
+```
 
 ## 7.
-a.
+
+**a.**
+
+```text
 biblioteca=# UPDATE prestamos
 biblioteca-# SET fecha_devolucion = '2026-09-29'
 biblioteca-# WHERE id_prestamo = 2;
 UPDATE 1
+
 biblioteca=# SELECT * FROM prestamos
 biblioteca-# ;
  id_prestamo | id_libro | fecha_prestamo | fecha_devolucion | usuario_prestatario
@@ -217,18 +302,27 @@ biblioteca-# ;
            2 |        4 | 2026-09-10     | 2026-09-29       | Ana Gómez
 (5 rows)
 
+```
 
-b.
+**b.**
+
+```text
 biblioteca=# DELETE FROM libros WHERE id_libro = 5;
 DELETE 1
+
 biblioteca=# SELECT * FROM PRESTAMOS
 biblioteca-# WHERE id_libro = 5;
  id_prestamo | id_libro | fecha_prestamo | fecha_devolucion | usuario_prestatario
 -------------+----------+----------------+------------------+---------------------
 (0 rows)
 
+```
+
 ## 8.
-a.
+
+**a.**
+
+```text
 biblioteca=# CREATE VIEW vista_libros_prestados AS
 SELECT l.titulo, a.nombre AS autor, p.usuario_prestatario
 FROM prestamos p
@@ -236,6 +330,7 @@ NATURAL JOIN AUTORES AS a
 NATURAL JOIN libros AS l
 ;
 CREATE VIEW
+
 biblioteca=# SELECT * FROM vista_libros_prestados;
           titulo          |         autor          | usuario_prestatario
 --------------------------+------------------------+---------------------
@@ -245,14 +340,23 @@ biblioteca=# SELECT * FROM vista_libros_prestados;
  1984                     | George Orwell          | Ana Gómez
 (4 rows)
 
-b.
+```
+
+**b.**
+
+```text
 biblioteca=# REVOKE ALL ON vista_libros_prestados FROM PUBLIC;
 REVOKE
 biblioteca=# GRANT SELECT ON vista_libros_prestados TO usuario_biblio;
 GRANT
 
+```
+
 ## 9.
-a.
+
+**a.**
+
+```text
 biblioteca=# CREATE OR REPLACE FUNCTION libros_por_autor(nombre_autor TEXT)
 RETURNS TABLE (
     id_libro INT,
@@ -266,13 +370,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 CREATE FUNCTION
+
 biblioteca=# SELECT libros_por_autor('Miguel de Cervantes');
-          libros_por_autor
+         libros_por_autor
 -------------------------------------
  (3,"Don Quijote de la Mancha",1605)
 (1 row)
 
-b.
+```
+
+**b.**
+
+```text
 biblioteca=# SELECT l.titulo, COUNT(p.id_prestamo) as numero_prestamos
 FROM libros AS l
 NATURAL JOIN prestamos AS p
@@ -286,14 +395,24 @@ LIMIT 3;
  1984                     |                1
 (3 rows)
 
+```
+
 ## 10.
-a.
+
+**a.**
+
+```text
 biblioteca=# \copy libros TO '/tmp/libros_exportados.csv' WITH (FORMAT CSV, HEADER);
 COPY 7
 
-b.
+```
+
+**b.**
+
+```text
 biblioteca=# \copy autores (nombre, nacionalidad) FROM 'autores.csv' WITH (FORMAT CSV, HEADER);
 COPY 2
+
 biblioteca=# select * from autores;
  id_autor |         nombre         | nacionalidad
 ----------+------------------------+--------------
@@ -305,3 +424,5 @@ biblioteca=# select * from autores;
         6 | 'Sofía'                | 'México'
         7 | 'Daniel'               | 'Venezuela'
 (7 rows)
+
+```
